@@ -8,12 +8,13 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     public function store(Request $request){
-        $user=User::create([
-            'name'=>$request->name
-        ,'email'=>$request->email
-        ,'pwd'=>$request->pwd
-        ,'role'=>$request->role
-    ]);
+        $validateData=$request->validate([
+            'name'=>'required|string'
+        ,'email'=>'required'
+        ,'pwd'=>'required|integer'
+        ,'role'=>'required'
+        ]);
+        $user=User::create($validateData);
     return response()->json($user,201);
     }
     public function index(){
@@ -22,7 +23,13 @@ class UserController extends Controller
     }
     public function update(Request $request,$id){
         $user=User::findOrFail($id);
-        $user->update($request->all());
+        $validateData=$request->validate([
+            'name'=>'somtimes|string'
+        ,'email'=>'somtimes'
+        ,'pwd'=>'somtimes|integer'
+        ,'role'=>'somtimes'
+        ]);
+        $user->update($validateData);
         return response()->json($user,200);
     }
     public function show($id){
