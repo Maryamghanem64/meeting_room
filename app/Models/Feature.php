@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Feature extends Model
+{
+    use HasFactory;
 
-{ use HasFactory;
-    public $timestamps=false;
-   protected $table='features';
-    protected $primaryKey='Id';
     protected $fillable = ['name'];
+    public $timestamps = false;
+
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class, 'feature_room');
+    }
 }
+?>
