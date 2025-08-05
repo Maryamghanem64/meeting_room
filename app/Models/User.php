@@ -9,14 +9,18 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory;
+   protected $primaryKey = 'Id';
+public $incrementing = true;
+protected $keyType = 'int';
 
-    protected $fillable = ['name', 'email', 'pwd'];
+    protected $fillable = ['name', 'email', 'password'];
     public $timestamps = true;
 
     public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'role_user');
-    }
+{
+    return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+}
+
 
     public function meetings()
     {
@@ -27,4 +31,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(MeetingAttendee::class, 'userId');
     }
+
+
 }

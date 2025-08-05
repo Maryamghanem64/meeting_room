@@ -21,7 +21,7 @@ class RoomController extends Controller
     //read method
 public function index()
         {
-            $rooms=Room::all();
+            $rooms=Room::with(['features', 'meetings'])->get();
             return response()->json(['message'=>'rooms retrieved successfully','rooms'=>$rooms],200);
         }
 //update methode
@@ -40,7 +40,7 @@ public function destroy($id)
     return response()->json(['message'=>'room deleted successfully'],200);}
 //show method
 public function show($id){
-        $room=Room::findOrFail($id);
+        $room=Room::with(['features', 'meetings'])->get()->findOrFail($id);
         return response()->json($room,200);
 
     }

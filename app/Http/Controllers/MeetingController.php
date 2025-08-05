@@ -14,7 +14,7 @@ class MeetingController extends Controller
      */
     public function index()
     {
-      $meeting=Meeting::all();
+      $meeting=Meeting::with(['user', 'room', 'attachments', 'attendees', 'minutes'])->get();
       return response()->json($meeting,200);
     }
 
@@ -32,7 +32,7 @@ class MeetingController extends Controller
      */
     public function show(string $id)
     {
-       $meeting=Meeting::find($id);
+       $meeting=Meeting::with(['user', 'room', 'attachments', 'attendees', 'minutes'])->get()->find($id);
      return response()->json($meeting,200);
     }
 

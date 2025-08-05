@@ -13,7 +13,7 @@ class MeetingMinuteController extends Controller
      */
     public function index()
     {
-        $minute=MeetingMinute::all();
+        $minute=MeetingMinute::with('meeting')->get();
         return response()->json($minute,200);
     }
 
@@ -31,7 +31,7 @@ class MeetingMinuteController extends Controller
      */
     public function show(string $id)
     {
-        $minute=MeetingMinute::find($id);
+        $minute=MeetingMinute::with('meeting')->get()->find($id);
         return response()->json($minute,200);
     }
 

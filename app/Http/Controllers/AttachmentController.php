@@ -14,7 +14,7 @@ class AttachmentController extends Controller
      */
     public function index()
     {
-       $attachment=Attachment::all();
+       $attachment=Attachment::with('meeting')->get();
        return response()->json($attachment,200);
     }
 
@@ -33,7 +33,7 @@ class AttachmentController extends Controller
      */
     public function show(string $id)
     {
-       $attachment=Attachment::find($id);
+       $attachment=Attachment::with('meeting')->get()->find($id);
         return response()->json($attachment,201);
     }
 

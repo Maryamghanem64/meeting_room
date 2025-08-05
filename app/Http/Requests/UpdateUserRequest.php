@@ -24,7 +24,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'sometimes|string',
             'email' => 'sometimes|email|unique:users,email,'.$this->route('user'),
-            'pwd' => 'sometimes|string|min:6'
+            'password' => 'sometimes|string|min:6'
         ];
     }
 }

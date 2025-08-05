@@ -20,7 +20,7 @@ class RoleController extends Controller
    }
    //read method
    public function index(){
-    $roles=Role::all();
+    $roles=Role::with('users')->get();
     return response()->json(['message'=>'Roles retrieved successfully','roles'=>$roles],200);
     }
     //update method
@@ -39,7 +39,7 @@ public function destroy($id){
     }
     //show method
     public function show($id){
-        $role=Role::find($id);
+        $role=Role::with('users')->get()->find($id);
         return response()->json(['message'=>'Role retrieved successfully','role'=>$role],200);
         }
 
