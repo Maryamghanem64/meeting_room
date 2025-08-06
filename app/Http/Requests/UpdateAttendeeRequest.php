@@ -22,9 +22,9 @@ class UpdateAttendeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meetingId'=>'sometimes|integer',
-        'userId'=>'sometimes|integer',
-        'isPresent'=>'sometimes|string'
+            'meetingId' => 'sometimes|exists:meetings,id',
+            'userId' => 'sometimes|exists:users,id',
+            'isPresent' => 'sometimes|boolean'
         ];
     }
 }

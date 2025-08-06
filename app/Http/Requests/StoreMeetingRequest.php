@@ -21,15 +21,15 @@ class StoreMeetingRequest extends FormRequest
      */
     public function rules(): array
     {
-        return[
-          'userId' => 'required|exists:users,id',
-        'roomId' => 'required|exists:rooms,id',
-        'title' => 'required|string|max:255',
-        'agenda' => 'nullable|string',
-        'startTime' => 'required|date',
-        'endTime' => 'required|date|after_or_equal:startTime',
-        'type' => 'required|string|max:50',
-        'status' => 'required|string|max:50'
+        return [
+            'userId' => 'required|exists:users,id',
+            'roomId' => 'required|exists:rooms,id',
+            'title' => 'required|string|max:255',
+            'agenda' => 'nullable|string',
+            'startTime' => 'required|date',
+            'endTime' => 'required|date|after_or_equal:startTime',
+            'type' => 'required|string|max:50',
+            'status' => 'required|string|max:50'
         ];
     }
 }

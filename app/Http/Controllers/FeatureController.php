@@ -14,32 +14,49 @@ class FeatureController extends Controller
      */
 //create method
    public function store(StoreFeatureRequest $request){
-
-        $role=Feature::create($request->validated());
-        return response()->json(['message'=>'Feature created successfully','role'=>$role],201);
+        try {
+            $feature = Feature::create($request->validated());
+            return response()->json(['message'=>'Feature created successfully','feature'=>$feature],201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
    }
    //read method
    public function index(){
-    $roles=Feature::all();
-    return response()->json(['message'=>'Features retrieved successfully','roles'=>$roles],200);
+        try {
+            $features = Feature::with('rooms')->get();
+            return response()->json(['message'=>'Features retrieved successfully','features'=>$features],200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
     //update method
     public function update(UpdateFeatureRequest $request,$id){
-         $role=Feature::find($id);
-
-         $role->update($request->validated());
-        return response()->json(['message'=>'Feature updated successfully','role'=>$role],200);
-
-}
+        try {
+            $feature = Feature::findOrFail($id);
+            $feature->update($request->validated());
+            return response()->json(['message'=>'Feature updated successfully','feature'=>$feature],200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
 //delete method
 public function destroy($id){
-    $role=Feature::find($id);
-    $role->delete();
-    return response()->json(['message'=>'Feature deleted successfully'],200);
+    try {
+        $feature = Feature::findOrFail($id);
+        $feature->delete();
+        return response()->json(['message'=>'Feature deleted successfully'],200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 404);
     }
+}
     //show method
     public function show($id){
-        $role=Feature::find($id);
-        return response()->json(['message'=>'Feature retrieved successfully','role'=>$role],200);
+        try {
+            $feature = Feature::with('rooms')->findOrFail($id);
+            return response()->json(['message'=>'Feature retrieved successfully','feature'=>$feature],200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
         }
+    }
 }

@@ -30,12 +30,12 @@ class Meeting extends Model
         return $this->hasMany(Attachment::class, 'meetingId');
     }
 
-    public function attendees()
+    public function meetingAttendees()
     {
         return $this->hasMany(MeetingAttendee::class, 'meetingId');
     }
 
-    public function minutes()
+    public function meetingMinutes()
     {
         return $this->hasMany(MeetingMinute::class, 'meetingId');
     }

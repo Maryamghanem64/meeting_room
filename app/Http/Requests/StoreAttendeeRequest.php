@@ -22,9 +22,9 @@ class StoreAttendeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meetingId'=>'required|integer',
-        'userId'=>'required|integer',
-        'isPresent'=>'required|string'
+            'meetingId' => 'required|exists:meetings,id',
+            'userId' => 'required|exists:users,id',
+            'isPresent' => 'required|boolean'
         ];
     }
 }

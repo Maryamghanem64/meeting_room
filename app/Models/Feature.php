@@ -14,7 +14,7 @@ class Feature extends Model
 
     public function rooms()
     {
-        return $this->belongsToMany(Room::class, 'feature_room');
+        return $this->belongsToMany(Room::class, 'feature_room', 'featureId', 'roomId');
     }
 }
 ?>

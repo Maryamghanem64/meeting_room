@@ -22,7 +22,7 @@ class UpdateMinuteRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'meetingId' => 'sometimes|exists:meetings,id',
+            'meetingId' => 'sometimes|exists:meetings,id',
             'description' => 'sometimes|string',
             'actionTaken' => 'nullable|string'
         ];

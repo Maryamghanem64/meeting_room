@@ -13,17 +13,25 @@ class MeetingAttendeeController extends Controller
      */
     public function index()
     {
-        $attendee=MeetingAttendee::with(['meeting', 'user'])->get();
-        return response()->json($attendee,200);
+        try {
+            $attendees = MeetingAttendee::with(['meeting', 'user'])->get();
+            return response()->json($attendees,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreAttendeeRequest $request)
-    { $attendee=MeetingAttendee::create($request->validated());
-        return response()->json($attendee,201);
-
+    {
+        try {
+            $attendee = MeetingAttendee::create($request->validated());
+            return response()->json($attendee,201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -31,8 +39,12 @@ class MeetingAttendeeController extends Controller
      */
     public function show(string $id)
     {
-       $attendee=MeetingAttendee::with(['meeting', 'user'])->get()->find($id);
-       return response()->json($attendee,200);
+        try {
+            $attendee = MeetingAttendee::with(['meeting', 'user'])->findOrFail($id);
+            return response()->json($attendee,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -40,9 +52,13 @@ class MeetingAttendeeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-         $attendee=MeetingAttendee::find($id);
-         $attendee->update($request->validated());
-         return response()->json($attendee,200);
+        try {
+            $attendee = MeetingAttendee::findOrFail($id);
+            $attendee->update($request->validated());
+            return response()->json($attendee,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -50,8 +66,12 @@ class MeetingAttendeeController extends Controller
      */
     public function destroy(string $id)
     {
-      $attendee=MeetingAttendee::find($id);
-      $attendee->delete();
-
+        try {
+            $attendee = MeetingAttendee::findOrFail($id);
+            $attendee->delete();
+            return response()->json(['message' => 'Attendee deleted'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 }

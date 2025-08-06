@@ -13,17 +13,25 @@ class MeetingMinuteController extends Controller
      */
     public function index()
     {
-        $minute=MeetingMinute::with('meeting')->get();
-        return response()->json($minute,200);
+        try {
+            $minutes = MeetingMinute::with('meeting')->get();
+            return response()->json($minutes,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreMinuteRequest $request)
-    { $minute=MeetingMinute::create($request->validated());
-        return response()->json($minute,201);
-
+    {
+        try {
+            $minute = MeetingMinute::create($request->validated());
+            return response()->json($minute,201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -31,8 +39,12 @@ class MeetingMinuteController extends Controller
      */
     public function show(string $id)
     {
-        $minute=MeetingMinute::with('meeting')->get()->find($id);
-        return response()->json($minute,200);
+        try {
+            $minute = MeetingMinute::with('meeting')->findOrFail($id);
+            return response()->json($minute,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -40,9 +52,13 @@ class MeetingMinuteController extends Controller
      */
     public function update(Request $request, string $id)
     {
-      $minute=MeetingMinute::find($id);
-      $minute->update($request->validated());
-      return response()->json($minute,200);
+        try {
+            $minute = MeetingMinute::findOrFail($id);
+            $minute->update($request->validated());
+            return response()->json($minute,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -50,8 +66,12 @@ class MeetingMinuteController extends Controller
      */
     public function destroy(string $id)
     {
-        $minute=MeetingMinute::find($id);
-        $minute->delete();
-        return response()->json(null,204);
+        try {
+            $minute = MeetingMinute::findOrFail($id);
+            $minute->delete();
+            return response()->json(['message' => 'Minute deleted'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 }

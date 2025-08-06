@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->id('Id');
-        $table->foreignId('meetingId')->constrained('meetings')->onDelete('cascade');
-        $table->string('filePath');
-        $table->string('fileType')->nullable();
-        $table->timestamps();
+            $table->foreignId('meetingId')->constrained('meetings', 'Id')->onDelete('cascade');
+            $table->string('filePath');
+            $table->string('fileType')->nullable();
+            $table->timestamps();
         });
     }
 

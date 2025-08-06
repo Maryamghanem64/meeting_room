@@ -22,9 +22,9 @@ class StoreAttachmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-          'meetingId' => 'required|exists:meetings,id',
-            'filePath' => 'required|string|max:255',
-            'fileType' => 'required|string|max:50'
+            'meetingId' => 'required|exists:meetings,id',
+            'filePath' => 'required|file',
+            'fileType' => 'nullable|string|max:50'
         ];
     }
 }

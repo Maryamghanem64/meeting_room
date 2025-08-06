@@ -22,14 +22,14 @@ class UpdateMeetingRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'userId' => 'sometimes|exists:users,id',
-        'roomId' => 'sometimes|exists:rooms,id',
-        'title' => 'sometimes|string|max:255',
-        'agenda' => 'nullable|string',
-        'startTime' => 'sometimes|date',
-        'endTime' => 'sometimes|date|after_or_equal:startTime',
-        'type' => 'sometimes|string|max:50',
-        'status' => 'sometimes|string|max:50'
+            'userId' => 'sometimes|exists:users,id',
+            'roomId' => 'sometimes|exists:rooms,id',
+            'title' => 'sometimes|string|max:255',
+            'agenda' => 'nullable|string',
+            'startTime' => 'sometimes|date',
+            'endTime' => 'sometimes|date|after_or_equal:startTime',
+            'type' => 'sometimes|string|max:50',
+            'status' => 'sometimes|string|max:50'
         ];
     }
 }

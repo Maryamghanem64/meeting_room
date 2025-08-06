@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAttachmentRequest;
 use App\Http\Requests\UpdateAttachmentRequest;
 use App\Models\Attachment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AttachmentController extends Controller
 {
@@ -14,8 +15,12 @@ class AttachmentController extends Controller
      */
     public function index()
     {
-       $attachment=Attachment::with('meeting')->get();
-       return response()->json($attachment,200);
+        try {
+            $attachments = Attachment::with('meeting')->get();
+            return response()->json($attachments, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -23,9 +28,19 @@ class AttachmentController extends Controller
      */
     public function store(StoreAttachmentRequest $request)
     {
-       $attachment = Attachment::create($request->validated());
-       return response()->json($attachment,201);
-
+        try {
+            $data = $request->validated();
+            if ($request->hasFile('filePath')) {
+                $file = $request->file('filePath');
+                $path = $file->store('attachments', 'public');
+                $data['filePath'] = $path;
+                $data['fileType'] = $file->getClientOriginalExtension();
+            }
+            $attachment = Attachment::create($data);
+            return response()->json($attachment, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -33,8 +48,12 @@ class AttachmentController extends Controller
      */
     public function show(string $id)
     {
-       $attachment=Attachment::with('meeting')->get()->find($id);
-        return response()->json($attachment,201);
+        try {
+            $attachment = Attachment::with('meeting')->findOrFail($id);
+            return response()->json($attachment, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -42,9 +61,24 @@ class AttachmentController extends Controller
      */
     public function update(UpdateAttachmentRequest $request, string $id)
     {
-         $attachment=Attachment::find($id);
-         $attachment->update($request->validated());
-         return response()->json($attachment,200);
+        try {
+            $attachment = Attachment::findOrFail($id);
+            $data = $request->validated();
+            if ($request->hasFile('filePath')) {
+                // Delete old file
+                if ($attachment->filePath && Storage::disk('public')->exists($attachment->filePath)) {
+                    Storage::disk('public')->delete($attachment->filePath);
+                }
+                $file = $request->file('filePath');
+                $path = $file->store('attachments', 'public');
+                $data['filePath'] = $path;
+                $data['fileType'] = $file->getClientOriginalExtension();
+            }
+            $attachment->update($data);
+            return response()->json($attachment, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     /**
@@ -52,8 +86,15 @@ class AttachmentController extends Controller
      */
     public function destroy(string $id)
     {
-         $attachment=Attachment::find($id);
-         $attachment->delete();
-         return response()->json(['message'=>'Attachment deleted successfully'],200);
+        try {
+            $attachment = Attachment::findOrFail($id);
+            if ($attachment->filePath && Storage::disk('public')->exists($attachment->filePath)) {
+                Storage::disk('public')->delete($attachment->filePath);
+            }
+            $attachment->delete();
+            return response()->json(['message' => 'Attachment deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 }

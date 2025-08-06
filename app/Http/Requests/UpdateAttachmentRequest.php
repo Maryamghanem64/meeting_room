@@ -23,9 +23,8 @@ class UpdateAttachmentRequest extends FormRequest
     {
         return [
             'meetingId' => 'sometimes|exists:meetings,id',
-            'filePath' => 'sometimes|string|max:255',
+            'filePath' => 'sometimes|file',
             'fileType' => 'sometimes|string|max:50'
-
         ];
     }
 }

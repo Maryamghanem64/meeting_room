@@ -59,24 +59,40 @@ class UserController extends Controller
     }
 
     public function index(){
-        $users = User::with(['roles', 'meetings', 'meetingAttendees'])->get();
-        return response()->json($users,200);
+        try {
+            $users = User::with(['roles', 'meetings', 'meetingAttendees'])->get();
+            return response()->json($users,200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function update(UpdateUserRequest $request, $id){
-        $user = User::findOrFail($id);
-
-        $user->update($request->validated());
-        return response()->json($user, 200);
+        try {
+            $user = User::findOrFail($id);
+            $user->update($request->validated());
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     public function show($id){
-        $user = User::with(['roles', 'meetings', 'meetingAttendees'])->get()->findOrFail($id);
-        return response()->json($user, 200);
+        try {
+            $user = User::with(['roles', 'meetings', 'meetingAttendees'])->findOrFail($id);
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     public function destroy($id){
-        $user = User::findOrFail($id);
-        $user->delete();
-        return response()->json(['message' => 'User deleted'], 200);
-    }}
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+            return response()->json(['message' => 'User deleted'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
+}
