@@ -30,25 +30,42 @@ class UserController extends Controller
             return response()->json(['message' => 'User created successfully',
         'user' => $user], 201);
     }
-    public function login(Request $request){
-     $request->validate([
-            'email' => 'required|string|email',
-              'password' => 'required|string',
-        ]);
-        if(!Auth::attempt($request->only('email','password'))){
-    return response()->json(['message' => 'Invalid email or password'], 401);}
-       $user=User ::where('email',$request->email)->first();
-       $token = $user->createToken('auth_token')->plainTextToken;
-       return response()->json(['message' => 'Logged in successfully','user'=>$user,
-       'token' => $token], 200);
-        }
+   public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string|min:6',
+    ]);
 
-   public function logout(Request $request){
-   $request->user()->currentAccessToken()->delete();
-    return response()->json(['message' => 'Logged out successfully'], 200);
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json(['message' => 'Invalid email or password'], 401);
+    }
 
 
-   }
+    $user = User::with('roles')->where('email', $request->email)->first();
+
+
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'message' => 'Logged in successfully',
+        'user' => ['id'=>$user->Id,
+    'name'=>$user->name,
+'email'=>$user->email],
+   'role'=>$user->roles->pluck('name'),
+        'token' => $token,
+        'token_type' => 'Bearer'
+    ], 200);
+}
+
+public function logout(Request $request)
+{
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json([
+        'message' => 'Logged out successfully'
+    ], 200);
+}
     /**
      * Display a listing of the resource.
      */
