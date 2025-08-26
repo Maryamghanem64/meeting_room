@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AttachmentController,
     FeatureController,
+    ForgetPasswordController,
     RoleController,
     RoomController,
     UserController,
@@ -12,20 +13,30 @@ use App\Http\Controllers\{
     MeetingAttendeeController,
     MeetingMinuteController
 };
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\ChangePasswordController;
+
 
 // Authentication Routes (Public)
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 
+// Password Reset Routes (Public)
+Route::post('/forgot-password', [ForgetPasswordController::class, 'sendResetLink']);
+Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
+
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
+    Route::post('/change-password', [ChangePasswordController::class, 'changePassword']);
 
-    // Admin Only Routes
-    Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
-    Route::apiResource('users', UserController::class);
-});
+    // Profile route for authenticated user
+    Route::get('/user/profile', [UserController::class, 'profile']);
 
+    // Admin Only
+    Route::middleware('role:Admin')->group(function () {
+        Route::apiResource('users', UserController::class);
+    });
 
     // Admin + Employee
     Route::middleware('role:Admin,Employee')->group(function () {
@@ -35,7 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('attachments', AttachmentController::class);
     });
 
-    // All Authenticated Users (Admin, Employee, Guest)
+    // Admin + Employee + Guest
     Route::middleware('role:Admin,Employee,Guest')->group(function () {
         Route::apiResource('rooms', RoomController::class);
         Route::apiResource('features', FeatureController::class);
