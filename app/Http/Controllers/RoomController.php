@@ -2,65 +2,131 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRoomRequest;
-use App\Http\Requests\UpdateRoomRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the rooms with their features.
      */
-//create method
-    public function store(StoreRoomRequest $request)
+    public function index()
     {
-        try {
-            $room = Room::create($request->validated());
-            return response()->json(['message'=>'room created successfully','room'=>$room],201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        // Get all rooms with their related features
+        $rooms = Room::with('features')->get();
+
+        return response()->json([
+            'success' => true,
+            'rooms' => $rooms
+        ], 200);
     }
-    //read method
-public function index()
+
+    /**
+     * Store a newly created room in storage.
+     */
+    public function store(Request $request)
     {
-        try {
-            $rooms = Room::with(['features', 'meetings'])->get();
-            return response()->json(['message'=>'rooms retrieved successfully','rooms'=>$rooms],200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        // Validate input data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'capacity' => 'required|integer|min:1',
+            'features' => 'array' // optional features (IDs)
+        ]);
+
+        // Create a new room
+        $room = Room::create($request->only(['name', 'location', 'capacity']));
+
+        // If features are provided, sync them with pivot table
+        if ($request->has('features')) {
+            $room->features()->sync($request->features);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Room created successfully',
+            'room' => $room->load('features')
+        ], 201);
     }
-//update methode
-public function update(UpdateRoomRequest $request,$id)
+
+    /**
+     * Display the specified room.
+     */
+    public function show($id)
     {
-        try {
-            $room = Room::findOrFail($id);
-            $room->update($request->validated());
-            return response()->json(['message'=>'room updated successfully','room'=>$room],200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 404);
+        $room = Room::with('features')->find($id);
+
+        if (!$room) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Room not found'
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'room' => $room
+        ], 200);
     }
-//delete method
-public function destroy($id)
+
+    /**
+     * Update the specified room in storage.
+     */
+    public function update(Request $request, $id)
     {
-        try {
-            $room = Room::findOrFail($id);
-            $room->delete();
-            return response()->json(['message'=>'room deleted successfully'],200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 404);
+        $room = Room::find($id);
+
+        if (!$room) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Room not found'
+            ], 404);
         }
+
+        // Validate input
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'location' => 'sometimes|string|max:255',
+            'capacity' => 'sometimes|integer|min:1',
+            'features' => 'array'
+        ]);
+
+        // Update room data
+        $room->update($request->only(['name', 'location', 'capacity']));
+
+        // Update features if provided
+        if ($request->has('features')) {
+            $room->features()->sync($request->features);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Room updated successfully',
+            'room' => $room->load('features')
+        ], 200);
     }
-//show method
-public function show($id){
-        try {
-            $room = Room::with(['features', 'meetings'])->findOrFail($id);
-            return response()->json($room,200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 404);
+
+    /**
+     * Remove the specified room from storage.
+     */
+    public function destroy($id)
+    {
+        $room = Room::find($id);
+
+        if (!$room) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Room not found'
+            ], 404);
         }
+
+        // Detach all features before deleting (cleanup pivot table)
+        $room->features()->detach();
+        $room->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Room deleted successfully'
+        ], 200);
     }
 }

@@ -12,6 +12,9 @@ class Role extends Model
     protected $fillable = ['name'];
     public $timestamps = true;
 
+    // Specify the primary key
+    protected $primaryKey = 'Id';
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');

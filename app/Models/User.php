@@ -11,11 +11,11 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory,Notifiable;
-   protected $primaryKey = 'Id';
+    protected $primaryKey = 'Id';
 public $incrementing = true;
 protected $keyType = 'int';
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'email', 'password', 'is_active'];
     public $timestamps = true;
     protected $hidden = ['password','remembe_token'];
 

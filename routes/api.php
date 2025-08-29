@@ -36,6 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin Only
     Route::middleware('role:Admin')->group(function () {
         Route::apiResource('users', UserController::class);
+        Route::patch('users/{user}/status', [UserController::class, 'updateStatus']); // User status update
+
+        // Role management endpoints
+        Route::get('roles', [RoleController::class, 'index']);
+        Route::post('roles', [RoleController::class, 'store']);
+        Route::put('roles/{role}', [RoleController::class, 'update']);
+        Route::delete('roles/{role}', [RoleController::class, 'destroy']);
     });
 
     // Admin + Employee

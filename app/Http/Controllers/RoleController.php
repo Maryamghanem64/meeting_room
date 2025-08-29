@@ -2,62 +2,125 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRoleRequest;
-use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class RoleController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get all roles
      */
-//create method
-   public function store(StoreRoleRequest $request){
+    public function index()
+    {
         try {
-            $role = Role::create($request->validated());
-            return response()->json(['message'=>'Role created successfully','role'=>$role],201);
+            $roles = Role::all();
+
+            return response()->json([
+                'success' => true,
+                'roles' => $roles
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-   }
-   //read method
-   public function index(){
-        try {
-            $roles = Role::with('users')->get();
-            return response()->json(['message'=>'Roles retrieved successfully','roles'=>$roles],200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-    //update method
-    public function update(UpdateRoleRequest $request,$id){
-        try {
-            $role = Role::findOrFail($id);
-            $role->update($request->validated());
-            return response()->json(['message'=>'Role updated successfully','role'=>$role],200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 404);
-        }
-    }
-//delete method
-public function destroy($id){
-    try {
-        $role = Role::findOrFail($id);
-        $role->delete();
-        return response()->json(['message'=>'Role deleted successfully'],200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 404);
-    }
-}
-    //show method
-    public function show($id){
-        try {
-            $role = Role::with('users')->findOrFail($id);
-            return response()->json(['message'=>'Role retrieved successfully','role'=>$role],200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 404);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
+    /**
+     * Store a newly created role
+     */
+    public function store(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:roles,name'
+            ]);
+
+            $role = Role::create([
+                'name' => $request->name
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Role created successfully',
+                'role' => $role
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->validator->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the specified role
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $role = Role::findOrFail($id);
+
+            $request->validate([
+                'name' => 'required|string|max:255|unique:roles,name,' . $role->id
+            ]);
+
+            $role->update([
+                'name' => $request->name
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Role updated successfully',
+                'role' => $role
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->validator->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
+
+    /**
+     * Remove the specified role
+     */
+    public function destroy($id)
+    {
+        try {
+            $role = Role::findOrFail($id);
+
+            // Check if role is being used by any users
+            if ($role->users()->count() > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete role. It is assigned to one or more users.'
+                ], 422);
+            }
+
+            $role->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Role deleted successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
 }
