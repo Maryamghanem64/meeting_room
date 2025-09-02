@@ -29,7 +29,7 @@ class UpdateMeetingRequest extends FormRequest
             'startTime' => 'sometimes|date',
             'endTime' => 'sometimes|date|after_or_equal:startTime',
             'type' => 'sometimes|string|max:50',
-            'status' => 'sometimes|string|max:50'
+            'status' => ['sometimes', 'string', 'max:50', 'regex:/^(pending|ongoing|completed|cancelled|scheduled)$/i']
         ];
     }
 }

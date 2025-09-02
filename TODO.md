@@ -1,10 +1,7 @@
-# UserController Update Method Fix
+# TODO: Fix Room Names and Delete Functionality
 
-## Tasks:
-- [x] Update UserController update method to return formatted user data
-- [x] Ensure response format matches index method structure
-- [ ] Test the update endpoint
-
-## Progress:
-- [x] Task 1: Updated UserController update method to return formatted user data consistent with index method
-- [x] Task 2: Response format now matches index method structure (id, name, email, role, role_id)
+## Issues to Fix
+- [x] Fix room names displaying as "Unknown" in React frontend (provided sample component)
+- [x] Implement working delete functionality with confirmation in React (provided sample component)
+- [x] Ensure Laravel API provides correct room data (verified controller and models)
+- [ ] Test the implementation

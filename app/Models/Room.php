@@ -9,6 +9,7 @@ class Room extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'Id';
     protected $fillable = ['name', 'location', 'capacity'];
     public $timestamps = true;
 

@@ -9,6 +9,7 @@ class Feature extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'Id';
     protected $fillable = ['name'];
     public $timestamps = false;
 

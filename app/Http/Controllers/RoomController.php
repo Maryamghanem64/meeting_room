@@ -31,7 +31,8 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
-            'features' => 'array' // optional features (IDs)
+            'features' => 'array', // optional features (IDs)
+            'features.*' => 'exists:features,Id' // ensure each feature ID exists
         ]);
 
         // Create a new room
@@ -39,7 +40,12 @@ class RoomController extends Controller
 
         // If features are provided, sync them with pivot table
         if ($request->has('features')) {
-            $room->features()->sync($request->features);
+            // Ensure features array contains only valid integers and remove duplicates
+            $features = array_filter($request->features, function ($value) {
+                return is_numeric($value) && intval($value) > 0;
+            });
+            $features = array_unique(array_map('intval', $features));
+            $room->features()->sync($features);
         }
 
         return response()->json([
@@ -88,7 +94,8 @@ class RoomController extends Controller
             'name' => 'sometimes|string|max:255',
             'location' => 'sometimes|string|max:255',
             'capacity' => 'sometimes|integer|min:1',
-            'features' => 'array'
+            'features' => 'array',
+            'features.*' => 'exists:features,Id' // ensure each feature ID exists
         ]);
 
         // Update room data
@@ -96,7 +103,12 @@ class RoomController extends Controller
 
         // Update features if provided
         if ($request->has('features')) {
-            $room->features()->sync($request->features);
+            // Ensure features array contains only valid integers and remove duplicates
+            $features = array_filter($request->features, function ($value) {
+                return is_numeric($value) && intval($value) > 0;
+            });
+            $features = array_unique(array_map('intval', $features));
+            $room->features()->sync($features);
         }
 
         return response()->json([

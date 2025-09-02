@@ -28,8 +28,8 @@ class StoreMeetingRequest extends FormRequest
             'agenda' => 'nullable|string',
             'startTime' => 'required|date',
             'endTime' => 'required|date|after_or_equal:startTime',
-            'type' => 'required|string|max:50',
-            'status' => 'required|string|max:50'
+            'type' => 'nullable|string|max:50',
+            'status' => ['required', 'string', 'max:50', 'regex:/^(pending|ongoing|completed|cancelled|scheduled)$/i']
         ];
     }
 }
