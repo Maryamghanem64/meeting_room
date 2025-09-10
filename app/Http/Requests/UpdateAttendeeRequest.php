@@ -22,8 +22,8 @@ class UpdateAttendeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meetingId' => 'sometimes|exists:meetings,id',
-            'userId' => 'sometimes|exists:users,id',
+            'meetingId' => 'sometimes|exists:meetings,Id',
+            'userId' => 'sometimes|exists:users,Id',
             'isPresent' => 'sometimes|boolean'
         ];
     }

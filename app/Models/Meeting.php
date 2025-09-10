@@ -37,8 +37,8 @@ class Meeting extends Model
         return $this->hasMany(MeetingAttendee::class, 'meetingId');
     }
 
-    public function meetingMinutes()
+    public function minutes()
     {
-        return $this->hasMany(MeetingMinute::class, 'meetingId');
+        return $this->hasOne(MeetingMinute::class, 'meeting_id');
     }
 }

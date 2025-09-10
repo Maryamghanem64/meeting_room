@@ -37,5 +37,8 @@ class DatabaseSeeder extends Seeder
                 $user->roles()->attach($roles->random()->id);
             }
         });
+
+        // Seed meetings
+        $this->call(MeetingSeeder::class);
     }
 }

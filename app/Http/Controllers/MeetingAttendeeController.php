@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAttendeeRequest;
+use App\Http\Requests\UpdateAttendeeRequest;
 use App\Models\MeetingAttendee;
 use Illuminate\Http\Request;
 
@@ -50,7 +51,7 @@ class MeetingAttendeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateAttendeeRequest $request, string $id)
     {
         try {
             $attendee = MeetingAttendee::findOrFail($id);

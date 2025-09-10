@@ -22,9 +22,9 @@ class StoreMinuteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meetingId' => 'required|exists:meetings,id',
-            'description' => 'required|string',
-            'actionTaken' => 'nullable|string'
+            'meeting_id' => 'required|exists:meetings,Id',
+            'notes' => 'required|string',
+            'decisions' => 'required|string'
         ];
     }
 }

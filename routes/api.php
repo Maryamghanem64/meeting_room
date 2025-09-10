@@ -11,7 +11,9 @@ use App\Http\Controllers\{
     UserController,
     MeetingController,
     MeetingAttendeeController,
-    MeetingMinuteController
+    MeetingMinuteController,
+    MinutesController,
+    ActionItemController
 };
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\ChangePasswordController;
@@ -48,9 +50,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin + Employee
     Route::middleware('role:Admin,Employee')->group(function () {
         Route::apiResource('meetings', MeetingController::class);
+        Route::patch('meetings/{id}', [MeetingController::class, 'update']); // Support PATCH for partial updates
+        Route::patch('meetings/{id}/join', [MeetingController::class, 'join']); // Join meeting endpoint
         Route::apiResource('meetingAttendees', MeetingAttendeeController::class);
-        Route::apiResource('meetingMinutes', MeetingMinuteController::class);
+
         Route::apiResource('attachments', AttachmentController::class);
+
+        // Minutes of Meeting (MoM) feature routes
+        Route::apiResource('minutes', MinutesController::class);
+        Route::apiResource('actionItems', ActionItemController::class);
     });
 
     // Admin + Employee + Guest

@@ -15,6 +15,43 @@ class StoreMeetingRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'userId' => $this->user_id ?? $this->userId,
+            'roomId' => $this->room_id ?? $this->roomId,
+            'startTime' => $this->start_time ?? $this->startTime,
+            'endTime' => $this->end_time ?? $this->endTime,
+        ]);
+
+        // Handle status if it's an array or scalar
+        if (isset($this->status)) {
+            if ($this->status === null) {
+                $this->merge(['status' => 'pending']);
+            }
+            if (is_array($this->status)) {
+                $status = $this->status[0] ?? null;
+                $this->merge(['status' => is_string($status) ? $status : (is_scalar($status) ? (string) $status : null)]);
+            } elseif (is_scalar($this->status)) {
+                $this->merge(['status' => (string) $this->status]);
+            } else {
+                $this->merge(['status' => null]);
+            }
+            if (is_string($this->status)) {
+                $status = strtolower($this->status);
+                if (!in_array($status, ['pending', 'ongoing', 'completed', 'cancelled', 'scheduled'])) {
+                    $status = 'pending';
+                }
+                $this->merge(['status' => $status]);
+            }
+        } else {
+            $this->merge(['status' => 'pending']);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -22,14 +59,18 @@ class StoreMeetingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'userId' => 'required|exists:users,id',
-            'roomId' => 'required|exists:rooms,id',
+            'userId' => 'nullable|exists:users,id',
+            'roomId' => 'required|integer|exists:rooms,Id',
             'title' => 'required|string|max:255',
             'agenda' => 'nullable|string',
             'startTime' => 'required|date',
             'endTime' => 'required|date|after_or_equal:startTime',
             'type' => 'nullable|string|max:50',
-            'status' => ['required', 'string', 'max:50', 'regex:/^(pending|ongoing|completed|cancelled|scheduled)$/i']
+            'status' => 'required|string|in:pending,ongoing,completed,cancelled,scheduled',
+            'attendees' => 'nullable|array',
+            'attendees.*' => 'integer|exists:users,id',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|mimes:pdf,doc,docx,txt,jpg,jpeg,png|max:10240'
         ];
     }
 }
